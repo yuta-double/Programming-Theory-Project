@@ -4,38 +4,55 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    Rigidbody player_rb;
+    Rigidbody playerRb;
 
-    public int jump_power = 10;
+    public Vector3 moveing;
+
+    public bool jumpingNow = false;
+
+    public string tagOfFloor = "floor";
+
+    public int jumpPower = 70;
     public int speed = 10;
 
     public float x_input, z_input;
 
-    public Vector3 moveing;
 
     void Start()
     {
-        player_rb = GetComponent<Rigidbody>();
+        playerRb = GetComponent<Rigidbody>();
     }
 
     private void FixedUpdate()
     {
         //Move
-        player_rb.AddForce(moveing * speed);
+        if (playerRb.velocity.magnitude <= 10 && !jumpingNow)
+        {
+            playerRb.AddForce(moveing * speed, ForceMode.VelocityChange);
+        }
     }
 
     void Update()
     {
-        x_input = Input.GetAxis("Horizontal");
-        z_input = Input.GetAxis("Vertical");
-        moveing = new Vector3(x_input, 0, z_input);
+        x_input = Input.GetAxisRaw("Horizontal");
+        z_input = Input.GetAxisRaw("Vertical");
+        moveing = new Vector3(x_input, 0, z_input).normalized;
         //Jump
         if (Input.GetButtonDown("Jump"))
             Jump();
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == tagOfFloor)
+        {
+            jumpingNow = false;
+        }
+    }
+
     void Jump()
     {
-        player_rb.AddForce(Vector3.up * jump_power, ForceMode.Impulse);
+        playerRb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+        jumpingNow = true;
     }
 }
