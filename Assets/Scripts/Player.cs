@@ -6,9 +6,10 @@ public class Player : MonoBehaviour
 {
     Rigidbody playerRb;
 
-    public Vector3 moveing;
+    public Vector3 walkDirection;
 
     public bool jumpingNow = false;
+    public bool warkingNow = false;
 
     public string tagOfFloor = "floor";
 
@@ -28,18 +29,23 @@ public class Player : MonoBehaviour
         //Move
         if (playerRb.velocity.magnitude <= 10 && !jumpingNow)
         {
-            playerRb.AddForce(moveing * speed, ForceMode.VelocityChange);
+            playerRb.AddForce(walkDirection * speed, ForceMode.VelocityChange);
         }
     }
 
     void Update()
     {
-        x_input = Input.GetAxisRaw("Horizontal");
-        z_input = Input.GetAxisRaw("Vertical");
-        moveing = new Vector3(x_input, 0, z_input).normalized;
+        x_input = Input.GetAxis("Horizontal");
+        z_input = Input.GetAxis("Vertical");
+        walkDirection = new Vector3(x_input, 0, z_input).normalized;
         //Jump
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && !jumpingNow)
             Jump();
+
+        if(walkDirection.magnitude > 0)
+        {
+            transform.rotation = Quaternion.LookRotation(walkDirection);
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
